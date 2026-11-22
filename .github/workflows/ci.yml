@@ -26,6 +26,7 @@ jobs:
             sdk: ^3.14.0
           workspace:
             - pkg
+            - pkg/example
           EOF
       - name: Install dependencies
         working-directory: pkg

@@ -8,3 +8,4 @@ export 'src/painter_widget.dart';
 export 'src/pixel_act_widget.dart';
 export 'src/pixel_asset_widget.dart';
 export 'src/pixel_fx_widget.dart';
+export 'src/pixel_iso_widget.dart';

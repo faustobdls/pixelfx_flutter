@@ -3,6 +3,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:pixelfx_catalog/pixelfx_catalog.dart';
 import 'package:pixelfx_core/pixelfx_core.dart';
+import 'package:pixelfx_iso/pixelfx_iso.dart';
 
 import 'gallery_page.dart';
 
@@ -16,7 +17,8 @@ class PixelFxGalleryApp extends StatelessWidget {
   PixelFxGalleryApp({
     super.key,
     PixelFxRegistry? registry,
-  }) : registry = registry ?? createDefaultRegistry();
+  }) : registry = registry ??
+            (createDefaultRegistry()..register(PixelFxIsoExtension()));
 
   @override
   Widget build(BuildContext context) {

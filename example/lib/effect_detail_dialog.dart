@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:material_ui/material_ui.dart';
 import 'package:pixelfx_core/pixelfx_core.dart';
 import 'package:pixelfx_flutter/pixelfx_flutter.dart';
+import 'package:pixelfx_iso/pixelfx_iso.dart';
 
 import 'snippet_builder.dart';
 
@@ -27,6 +28,9 @@ class _EffectDetailDialogState extends State<EffectDetailDialog> {
   late final PixelFxController _controller;
   String? _selectedPalette;
   bool _actMode = false;
+  bool _isoMode = false;
+  IsoDir _isoDir = IsoDir.se;
+  IsoPlane _isoPlane = IsoPlane.floor;
   bool _flip = false;
   bool _showActor = true;
   bool _showTarget = true;
@@ -38,10 +42,13 @@ class _EffectDetailDialogState extends State<EffectDetailDialog> {
   bool get _supportsAct =>
       widget.asset is PixelEffect && (widget.asset as PixelEffect).act != null;
 
+  bool get _isNativeIso => widget.asset.meta.extra['iso'] == true;
+
   @override
   void initState() {
     super.initState();
-    _backdrop = widget.asset.meta.bg;
+    _isoMode = _isNativeIso;
+    _backdrop = _isNativeIso ? BackdropKind.isoGrid : widget.asset.meta.bg;
     _controller = PixelFxController(
       asset: widget.asset,
       actMode: false,
@@ -84,6 +91,9 @@ class _EffectDetailDialogState extends State<EffectDetailDialog> {
     final snippet = buildDartSnippet(
       asset: widget.asset,
       actMode: _actMode,
+      isoMode: _isoMode,
+      dir: _isoDir,
+      plane: _isoPlane,
       paletteName: _selectedPalette,
       backdrop: _backdrop,
       flip: _flip,
@@ -184,11 +194,28 @@ class _EffectDetailDialogState extends State<EffectDetailDialog> {
                     Positioned.fill(
                       child: Padding(
                         padding: const EdgeInsets.all(10),
-                        child: PixelAssetView(
-                          asset: widget.asset,
-                          controller: _controller,
-                          fit: BoxFit.contain,
-                        ),
+                        child: _isoMode
+                            ? PixelIsoView(
+                                asset: widget.asset,
+                                dir: _isoDir,
+                                plane: _isoPlane,
+                                actMode: _actMode,
+                                backdrop: _backdrop,
+                                showActor: _showActor,
+                                showTarget: _showTarget,
+                                showSkeleton: _showSkeleton,
+                                flip: _flip,
+                                speed: _speed,
+                                palette: _selectedPalette != null
+                                    ? widget.registry.palettes[_selectedPalette!]
+                                    : null,
+                                fit: BoxFit.contain,
+                              )
+                            : PixelAssetView(
+                                asset: widget.asset,
+                                controller: _controller,
+                                fit: BoxFit.contain,
+                              ),
                       ),
                     ),
                     Positioned(
@@ -293,6 +320,21 @@ class _EffectDetailDialogState extends State<EffectDetailDialog> {
                       },
                     ),
                   FilterChip(
+                    label: const Text('2.5D Iso'),
+                    selected: _isoMode,
+                    onSelected: (v) {
+                      setState(() {
+                        _isoMode = v;
+                        if (v && _backdrop == BackdropKind.dark) {
+                          _backdrop = BackdropKind.isoGrid;
+                        } else if (!v && !_isNativeIso && _backdrop == BackdropKind.isoGrid) {
+                          _backdrop = widget.asset.meta.bg;
+                        }
+                      });
+                      _applyConfig();
+                    },
+                  ),
+                  FilterChip(
                     label: const Text('Flip'),
                     selected: _flip,
                     onSelected: (v) {
@@ -327,6 +369,46 @@ class _EffectDetailDialogState extends State<EffectDetailDialog> {
                   ),
                 ],
               ),
+              if (_isoMode) ...[
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    const Text(
+                      'Dir:',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF9C93B8)),
+                    ),
+                    for (final d in IsoDir.values)
+                      ChoiceChip(
+                        label: Text(d.label),
+                        selected: _isoDir == d,
+                        onSelected: (_) => setState(() => _isoDir = d),
+                      ),
+                  ],
+                ),
+                if (!_isNativeIso) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      const Text(
+                        'Plane:',
+                        style: TextStyle(fontSize: 12, color: Color(0xFF9C93B8)),
+                      ),
+                      for (final p in IsoPlane.values)
+                        ChoiceChip(
+                          label: Text(p.name),
+                          selected: _isoPlane == p,
+                          onSelected: (_) => setState(() => _isoPlane = p),
+                        ),
+                    ],
+                  ),
+                ],
+              ],
               const SizedBox(height: 12),
               Wrap(
                 spacing: 6,

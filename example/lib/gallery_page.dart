@@ -233,6 +233,7 @@ class _AssetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final m = asset.meta;
     final hasAct = asset is PixelEffect && (asset as PixelEffect).act != null;
+    final isIso = m.extra['iso'] == true;
 
     return Card(
       key: Key('asset-card-${m.id}'),
@@ -278,6 +279,27 @@ class _AssetCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (isIso)
+                    Container(
+                      margin: const EdgeInsets.only(left: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1.5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF153430),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: const Color(0xFF58F2C8)),
+                      ),
+                      child: const Text(
+                        'ISO',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF8CFFDF),
+                        ),
+                      ),
+                    ),
                   if (hasAct)
                     Container(
                       margin: const EdgeInsets.only(left: 4),

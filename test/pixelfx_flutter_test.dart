@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pixelfx_core/pixelfx_core.dart';
 import 'package:pixelfx_flutter/pixelfx_flutter.dart';
+import 'package:pixelfx_iso/pixelfx_iso.dart';
 
 final PureEffect _testPulseEffect = PureEffect(
   meta: const EffectMeta(
@@ -124,5 +125,33 @@ void main() {
     final sized = tester.widget<SizedBox>(find.byType(SizedBox).first);
     expect(sized.width, equals(64));
     expect(sized.height, equals(64));
+  });
+
+  testWidgets('PixelIsoView and PixelIsoTileView render 2.5D iso effects and acted rigs', (tester) async {
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: Column(
+          children: [
+            PixelIsoTileView(
+              tileAsset: isoStoneTile,
+              scale: 2,
+            ),
+            PixelIsoView(
+              asset: _testPulseEffect,
+              dir: IsoDir.ne,
+              plane: IsoPlane.floor,
+              actMode: true,
+              showSkeleton: true,
+              scale: 2,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    await tester.pump(const Duration(milliseconds: 80));
+    expect(find.byType(PixelIsoTileView), findsOneWidget);
+    expect(find.byType(PixelIsoView), findsNWidgets(2));
   });
 }

@@ -15,12 +15,12 @@ void main() {
     await tester.pump(const Duration(milliseconds: 80));
 
     expect(find.text('PixelFx Gallery'), findsOneWidget);
-    expect(find.text('244 / 244 assets'), findsOneWidget);
+    expect(find.text('254 / 254 assets'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField), 'sword-slash');
     await tester.pump(const Duration(milliseconds: 50));
 
-    expect(find.text('1 / 244 assets'), findsOneWidget);
+    expect(find.text('1 / 254 assets'), findsOneWidget);
     expect(find.byKey(const Key('asset-card-melee/sword-slash')), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('asset-card-melee/sword-slash')));
@@ -31,6 +31,9 @@ void main() {
 
     await tester.tap(find.text('Act'));
     await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(find.text('2.5D Iso'));
+    await tester.pump(const Duration(milliseconds: 50));
+    expect(find.text('Dir:'), findsOneWidget);
     await tester.tap(find.text('Skeleton'));
     await tester.pump(const Duration(milliseconds: 50));
 

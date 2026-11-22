@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main, update]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: pkg
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      # Standalone repo: provide a parent pub workspace so pkg/pubspec.yaml stays clean for dry-run.
+      - name: Create isolated workspace wrapper
+        run: |
+          cat << 'EOF' > pubspec.yaml
+          name: _ci_workspace
+          publish_to: none
+          environment:
+            sdk: ^3.14.0
+          workspace:
+            - pkg
+          EOF
+      - name: Install dependencies
+        working-directory: pkg
+        run: flutter pub get
+      - name: Analyze package library & tests
+        working-directory: pkg
+        run: flutter analyze --fatal-infos lib test
+      - name: Run tests
+        working-directory: pkg
+        run: flutter test
+      - name: Dry-run publish check
+        working-directory: pkg
+        run: flutter pub publish --dry-run

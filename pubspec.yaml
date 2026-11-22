@@ -1,0 +1,19 @@
+name: pixelfx_flutter
+description: Flutter runtime widgets, animation controllers, in-memory baker, and CustomPainter integration for pixelfx_core.
+version: 0.1.0
+repository: https://github.com/faustobdls/pixelfx_flutter
+resolution: workspace
+
+environment:
+  sdk: ^3.14.0
+  flutter: ">=3.27.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  pixelfx_core: ^0.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

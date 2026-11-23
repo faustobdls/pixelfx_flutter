@@ -74,6 +74,18 @@ jobs:
       - name: Dry-run publish check
         working-directory: pkg
         run: flutter pub publish --dry-run
+      - name: Generate OIDC token for pub.dev
+        if: github.event_name == 'push' || inputs.dry_run == false
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pubToken = await core.getIDToken('https://pub.dev');
+            core.setSecret(pubToken);
+            core.exportVariable('PUB_TOKEN', pubToken);
+      - name: Authenticate with pub.dev
+        if: github.event_name == 'push' || inputs.dry_run == false
+        working-directory: pkg
+        run: flutter pub token add https://pub.dev --env-var PUB_TOKEN
       - name: Publish to pub.dev
         if: github.event_name == 'push' || inputs.dry_run == false
         working-directory: pkg
